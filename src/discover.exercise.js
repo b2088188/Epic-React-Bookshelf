@@ -7,31 +7,19 @@ import {FaSearch, FaTimes} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import {client} from './utils/api-client'
+import {useAsync} from 'utils/hooks'
+
 import * as colors from './styles/colors'
 
 function DiscoverBooksScreen() {
-  const [status, setStatus] = useState('idle')
-  const [data, setData] = useState(null)
-  const [error, setError] = useState(null)
+  const {data, error, run, isLoading, isError, isSuccess} = useAsync()
   const [query, setQuery] = useState('')
   const [queried, setQueried] = useState(false)
 
   useEffect(() => {
     if (!queried) return
-    fetchBooks(query)
-    async function fetchBooks(query) {
-      try {
-        setStatus('pending')
-        setError(null)
-        const data = await client(`books?query=${encodeURIComponent(query)}`)
-        setData(data)
-        setStatus('resolved')
-      } catch (err) {
-        setStatus('rejected')
-        setError(err)
-      }
-    }
-  }, [queried, query])
+    run(client(`books?query=${encodeURIComponent(query)}`))
+  }, [queried, query, run])
 
   // 🐨 Add a useEffect callback here for making the request with the
   // client and updating the status and data.
@@ -41,9 +29,6 @@ function DiscoverBooksScreen() {
   // they haven't then return early (💰 this is what the queried state is for).
 
   // 🐨 replace these with derived state values based on the status.
-  const isLoading = status === 'pending'
-  const isSuccess = status === 'resolved'
-  const isError = status === 'rejected'
 
   function handleSearchSubmit(e) {
     const {search} = e.target.elements
