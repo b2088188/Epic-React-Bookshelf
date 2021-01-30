@@ -3,25 +3,33 @@ import {jsx} from '@emotion/core'
 import React, {useState, useEffect} from 'react'
 import './bootstrap'
 import Tooltip from '@reach/tooltip'
-import {FaSearch} from 'react-icons/fa'
+import {FaSearch, FaTimes} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import {client} from './utils/api-client'
+import * as colors from './styles/colors'
 
 function DiscoverBooksScreen() {
   const [status, setStatus] = useState('idle')
   const [data, setData] = useState(null)
+  const [error, setError] = useState(null)
   const [query, setQuery] = useState('')
   const [queried, setQueried] = useState(false)
 
   useEffect(() => {
     if (!queried) return
-    setStatus('pending')
     fetchBooks(query)
     async function fetchBooks(query) {
-      const data = await client(`books?query=${encodeURIComponent(query)}`)
-      setData(data)
-      setStatus('resolved')
+      try {
+        setStatus('pending')
+        setError(null)
+        const data = await client(`books?query=${encodeURIComponent(query)}`)
+        setData(data)
+        setStatus('resolved')
+      } catch (err) {
+        setStatus('rejected')
+        setError(err)
+      }
     }
   }, [queried, query])
 
@@ -35,6 +43,7 @@ function DiscoverBooksScreen() {
   // 🐨 replace these with derived state values based on the status.
   const isLoading = status === 'pending'
   const isSuccess = status === 'resolved'
+  const isError = status === 'rejected'
 
   function handleSearchSubmit(e) {
     const {search} = e.target.elements
@@ -64,12 +73,23 @@ function DiscoverBooksScreen() {
                 background: 'transparent',
               }}
             >
-              {isLoading ? <Spinner /> : <FaSearch aria-label="search" />}
+              {isLoading ? (
+                <Spinner />
+              ) : isError ? (
+                <FaTimes aria-label="error" css={{color: colors.danger}} />
+              ) : (
+                <FaSearch aria-label="search" />
+              )}
             </button>
           </label>
         </Tooltip>
       </form>
-
+      {isError && error ? (
+        <div css={{color: colors.danger}}>
+          <p>There was an error:</p>
+          <pre>{error.message}</pre>
+        </div>
+      ) : null}
       {isSuccess ? (
         data?.books?.length ? (
           <BookListUL css={{marginTop: 20}}>

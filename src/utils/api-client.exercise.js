@@ -5,7 +5,9 @@ function client(endpoint, customConfig = {}) {
     ...customConfig,
   }
   return window.fetch(`${url}/${endpoint}`, config).then(async res => {
-    return await res.json()
+    const data = await res.json()
+    if (res.ok) return data
+    return Promise.reject(data)
   })
 }
 
