@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useQuery, useMutation, useQueryClient} from 'react-query'
-import {client} from 'utils/api-client'
+import {client} from 'utils/api-client.exercise'
 import {useAsync} from 'utils/hooks'
 import * as colors from 'styles/colors'
 import {CircleButton, Spinner} from './lib'
