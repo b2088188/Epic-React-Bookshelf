@@ -1,19 +1,14 @@
 /** @jsx jsx */
-import {jsx} from '@emotion/core'
+import {jsx, css} from '@emotion/core'
 
 import * as React from 'react'
-import {Routes, Route, useParams, Link} from 'react-router-dom'
+import {Routes, Route, useParams, Link, useMatch} from 'react-router-dom'
 import {BookScreen} from './screens/book.exercise'
 import {DiscoverBooksScreen} from './screens/discover'
 import {NotFoundScreen} from './screens/not-found.exercise'
 import {Button} from './components/lib'
 import * as mq from './styles/media-queries'
 import * as colors from './styles/colors'
-// 🐨 you'll need to import all the screen components in the screens directory
-// /discover       ->     Discover books screen
-// /book/:bookId   ->     Book screen
-// *               ->     Helpful "not found" screen
-// 💰 DiscoverBooksScreen, BookScreen, NotFoundScreen
 
 function AuthenticatedApp({user, logout}) {
   return (
@@ -60,23 +55,34 @@ function AuthenticatedApp({user, logout}) {
 }
 
 function NavLink(props) {
+  // Check if the current URL is match the link's to
+  // if so then generate the special CSS styles
+  const matchMarkUp = useMatch(props.to)
+    ? `border-left: 5px solid ${colors.indigo};
+  background: ${colors.gray10};
+  &:hover {
+    background: ${colors.gray20};
+  }
+}`
+    : null
   return (
     <Link
-      css={{
-        display: 'block',
-        padding: '8px 15px 8px 10px',
-        margin: '5px 0',
-        width: '100%',
-        height: '100%',
-        color: colors.text,
-        borderRadius: '2px',
-        borderLeft: '5px solid transparent',
-        ':hover': {
-          color: colors.indigo,
-          textDecoration: 'none',
-          background: colors.gray10,
-        },
-      }}
+      css={css`
+        display: block;
+        padding: 8px 15px 8px 10px;
+        margin: 5px 0;
+        width: 100%;
+        height: 100%;
+        color: ${colors.text};
+        border-radius: 2px;
+        border-left: 5px solid transparent;
+        &:hover {
+          color: ${colors.indigo};
+          text-decoration: none;
+          background: ${colors.gray10};
+        }
+        ${matchMarkUp}
+      `}
       {...props}
     />
   )
