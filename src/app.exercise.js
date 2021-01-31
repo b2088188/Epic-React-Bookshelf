@@ -7,6 +7,8 @@ import {client} from './utils/api-client'
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
 import {useAsync} from './utils/hooks'
+import * as colors from './styles/colors'
+import {FullPageSpinner} from 'components/lib'
 
 async function getUser() {
   let user = null
@@ -15,37 +17,64 @@ async function getUser() {
     const data = await client('me', {token})
     user = data.user
   }
-
   return user
 }
+
 function App() {
-  //const {data: user, error, isIdle, isLoading, isSuccess, isError, run, setData} = useAsync()
-  const [user, setUser] = useState(null)
+  const {
+    data: user,
+    error,
+    isIdle,
+    isLoading,
+    isSuccess,
+    isError,
+    run,
+    setData,
+  } = useAsync()
 
   useEffect(() => {
-    getUser().then(user => setUser(user))
-  }, [])
+    run(getUser())
+  }, [run])
 
   async function login(form) {
     try {
       const user = await auth.login(form)
-      setUser(user)
+      setData(user)
     } catch (err) {}
   }
   async function register(form) {
     try {
       const user = await auth.register(form)
-      setUser(user)
+      setData(user)
     } catch (err) {}
   }
 
   async function logout() {
     await auth.logout()
-    setUser(null)
+    setData(null)
   }
 
-  if (user) return <AuthenticatedApp user={user} logout={logout} />
-  return <UnauthenticatedApp login={login} register={register} />
+  if (isIdle || isLoading) return <FullPageSpinner />
+  if (isError)
+    return (
+      <div
+        css={{
+          color: colors.danger,
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <p>Uh oh... There's a problem. Try refreshing the app.</p>
+        <pre>{error.message}</pre>
+      </div>
+    )
+  if (isSuccess) {
+    if (user) return <AuthenticatedApp user={user} logout={logout} />
+    return <UnauthenticatedApp login={login} register={register} />
+  }
 }
 
 export {App}
