@@ -10,8 +10,12 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
-import {useQuery, useMutation, useQueryClient} from 'react-query'
-import {client} from 'utils/api-client.exercise'
+import {
+  useListItem,
+  useCreateListItem,
+  useUpdateListItem,
+  useRemoveListItem,
+} from 'utils/list-items'
 import {useAsync} from 'utils/hooks'
 import * as colors from 'styles/colors'
 import {CircleButton, Spinner} from './lib'
@@ -48,60 +52,10 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({user, book}) {
-  const queryClient = useQueryClient()
-  //query user's data from the back-end
-  const {data: listItems} = useQuery({
-    queryKey: 'list-items',
-    queryFn: () =>
-      client('list-items', {token: user.token}).then(data => data.listItems),
-  })
-  // 🐨 search through the listItems you got from react-query and find the
-  // one with the right bookId.
-  const listItem = listItems?.find(el => el.bookId === book.id) || null
-
-  // 💰 for all the mutations below, if you want to get the list-items cache
-  // updated after this query finishes the use the `onSettled` config option
-  // to queryCache.invalidateQueries('list-items')
-
-  // 🐨 call useMutation here and assign the mutate function to "update"
-  // the mutate function should call the list-items/:listItemId endpoint with a PUT
-  //   and the updates as data. The mutate function will be called with the updates
-  //   you can pass as data.
-  const {mutateAsync: update} = useMutation(
-    updates =>
-      client(`list-items/${updates.id}`, {
-        method: 'PUT',
-        data: updates,
-        token: user.token,
-      }),
-    //queries(user's data) get invalidated and refetched after success or fail
-    {onSettled: () => queryClient.invalidateQueries('list-items')},
-  )
-
-  // 🐨 call useMutation here and assign the mutate function to "remove"
-  // the mutate function should call the list-items/:listItemId endpoint with a DELETE
-  const {mutateAsync: remove} = useMutation(
-    ({id}) =>
-      client(`list-items/${id}`, {
-        method: 'DELETE',
-        token: user.token,
-      }),
-    {onSettled: () => queryClient.invalidateQueries('list-items')},
-  )
-  // 🐨 call useMutation here and assign the mutate function to "create"
-  // the mutate function should call the list-items endpoint with a POST
-  // and the bookId the listItem is being created for.
-  const {mutateAsync: create} = useMutation(
-    ({bookId}) =>
-      client(`list-items`, {
-        method: 'POST',
-        data: {bookId},
-        token: user.token,
-      }),
-    {
-      onSettled: () => queryClient.invalidateQueries('list-items'),
-    },
-  )
+  const listItem = useListItem(user, book.id)
+  const {mutateAsync: update} = useUpdateListItem(user)
+  const {remove} = useRemoveListItem(user)
+  const {create} = useCreateListItem(user)
 
   return (
     <React.Fragment>
