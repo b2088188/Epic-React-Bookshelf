@@ -1,25 +1,51 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
-import * as React from 'react'
-// 🐨 you're going to need this:
-// import * as auth from 'auth-provider'
+import React, {useState, useEffect} from 'react'
+import * as auth from 'auth-provider'
+import {client} from './utils/api-client'
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
+import {useAsync} from './utils/hooks'
 
+async function getUser() {
+  let user = null
+  const token = await auth.getToken()
+  if (token) {
+    const data = await client('me', {token})
+    user = data.user
+  }
+
+  return user
+}
 function App() {
-  // 🐨 useState for the user
+  //const {data: user, error, isIdle, isLoading, isSuccess, isError, run, setData} = useAsync()
+  const [user, setUser] = useState(null)
 
-  // 🐨 create a login function that calls auth.login then sets the user
-  // 💰 const login = form => auth.login(form).then(u => setUser(u))
-  // 🐨 create a registration function that does the same as login except for register
+  useEffect(() => {
+    getUser().then(user => setUser(user))
+  }, [])
 
-  // 🐨 create a logout function that calls auth.logout() and sets the user to null
+  async function login(form) {
+    try {
+      const user = await auth.login(form)
+      setUser(user)
+    } catch (err) {}
+  }
+  async function register(form) {
+    try {
+      const user = await auth.register(form)
+      setUser(user)
+    } catch (err) {}
+  }
 
-  // 🐨 if there's a user, then render the AuthenticatedApp with the user and logout
-  // 🐨 if there's not a user, then render the UnauthenticatedApp with login and register
+  async function logout() {
+    await auth.logout()
+    setUser(null)
+  }
 
-  return <UnauthenticatedApp />
+  if (user) return <AuthenticatedApp user={user} logout={logout} />
+  return <UnauthenticatedApp login={login} register={register} />
 }
 
 export {App}

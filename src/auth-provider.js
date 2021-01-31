@@ -35,7 +35,9 @@ async function client(endpoint, data) {
   const config = {
     method: 'POST',
     body: JSON.stringify(data),
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+      'Content-Type': 'application/json',
+    },
   }
 
   return window.fetch(`${authURL}/${endpoint}`, config).then(async response => {
