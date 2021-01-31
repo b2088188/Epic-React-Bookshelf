@@ -4,7 +4,7 @@ import {jsx} from '@emotion/core'
 import * as React from 'react'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
-import {useQueryClient, useQuery} from 'react-query'
+import {useQuery} from 'react-query'
 import {client} from 'utils/api-client'
 import * as colors from 'styles/colors'
 import {BookRow} from 'components/book-row'
@@ -26,7 +26,6 @@ const loadingBooks = Array.from({length: 10}, (v, index) => ({
 }))
 
 function DiscoverBooksScreen({user}) {
-  const queryClient = useQueryClient()
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState(false)
   // 🐨 replace this useAsync call with a useQuery call to handle the book search
