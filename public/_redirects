@@ -1,1 +1,3 @@
+// Redirect by Netlify
+/      /discover 		302!
 /*    /index.html   200

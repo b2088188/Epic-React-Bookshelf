@@ -1,1 +1,10 @@
-{}
+// redirect by build local server
+{
+	"redirects": [
+		{
+		"source": "/",
+		"destination": "/discover",
+		"type": 302
+		}
+	]
+}
