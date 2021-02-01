@@ -1,18 +1,18 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
-import * as React from 'react'
+import React, {useState, useEffect} from 'react'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
-import {useBookSearch} from 'utils/books'
+import {useBookSearch, refetchBookSearchQuery} from 'utils/books'
 import * as colors from 'styles/colors'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Spinner, Input} from 'components/lib'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
 
 function DiscoverBooksScreen({user}) {
-  const [query, setQuery] = React.useState('')
-  const [queried, setQueried] = React.useState(false)
+  const [query, setQuery] = useState('')
+  const [queried, setQueried] = useState(false)
   // 🐨 replace this useAsync call with a useQuery call to handle the book search
   // the queryKey should be ['bookSearch', {query}]
   // the queryFn should be the same thing we have in the run function below
@@ -21,6 +21,11 @@ function DiscoverBooksScreen({user}) {
     query,
     user,
   )
+
+  useEffect(() => {
+    // When component unmount, remove old book search query from cache and refetch new one
+    return () => refetchBookSearchQuery(user)
+  }, [query])
 
   function handleSearchSubmit(event) {
     event.preventDefault()
