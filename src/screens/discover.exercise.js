@@ -1,14 +1,13 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
-import React, {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
 import {useBookSearch, refetchBookSearchQuery} from 'utils/books'
 import * as colors from 'styles/colors'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Spinner, Input} from 'components/lib'
-import bookPlaceholderSvg from 'assets/book-placeholder.svg'
 
 function DiscoverBooksScreen({user}) {
   const [query, setQuery] = useState('')
@@ -25,7 +24,7 @@ function DiscoverBooksScreen({user}) {
   useEffect(() => {
     // When component unmount, remove old book search query from cache and refetch new one
     return () => refetchBookSearchQuery(user)
-  }, [query])
+  }, [user])
 
   function handleSearchSubmit(event) {
     event.preventDefault()

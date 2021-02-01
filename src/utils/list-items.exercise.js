@@ -1,3 +1,4 @@
+import * as R from 'ramda'
 import {setQueryDataForBook} from './books'
 import {useQuery, useQueryClient, useMutation} from 'react-query'
 import {client} from 'utils/api-client.exercise'
@@ -32,7 +33,15 @@ function useListItem(user, bookId) {
 function useDefaultMutationOptions() {
   const queryClient = useQueryClient()
   //queries(user's data) get invalidated and refetched after success or fail
-  return {onSettled: () => queryClient.invalidateQueries('list-items')}
+  return {
+    onSettled: () => queryClient.invalidateQueries('list-items'),
+    //The recover argument will be the thing that we return from onMutate function
+    onError: (err, variables, recover) => {
+      // If has an error, then restore to previous state
+      //() => queryClient.setQueryData('list-items', prevItems)
+      if (typeof recover === 'function') recover()
+    },
+  }
 }
 
 function useCreateListItem(user, customOptions) {
@@ -56,6 +65,7 @@ function useCreateListItem(user, customOptions) {
 }
 
 function useUpdateListItem(user, customOptions) {
+  const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
 
   // the mutate function should call the list-items/:listItemId endpoint with a PUT
@@ -70,12 +80,29 @@ function useUpdateListItem(user, customOptions) {
     {
       ...defaultOptions,
       ...customOptions,
+      //This will fire before mutate function, and receiving same arguments mutate function received.
+      // Receiving the updated item
+      onMutate: newItem => {
+        // Get the previous listItems
+        const prevItems = queryClient.getQueryData('list-items')
+        queryClient.setQueryData('list-items', oldData => {
+          return oldData.map(el => {
+            // If the old item is the one we want to update,
+            // then return the item with new property
+            // we just assume the server will do, and do the same thing before server finished
+            return el.id === newItem.id ? {...el, ...newItem} : el
+          })
+        })
+        // The value return from onMutate will be the third argument that onError receives
+        return () => queryClient.setQueryData('list-items', prevItems)
+      },
     },
   )
   return {...mutation, update: mutation.mutateAsync}
 }
 
 function useRemoveListItem(user, customOptions) {
+  const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "remove"
   // the mutate function should call the list-items/:listItemId endpoint with a DELETE
@@ -88,6 +115,15 @@ function useRemoveListItem(user, customOptions) {
     {
       ...defaultOptions,
       ...customOptions,
+      onMutate: ({id}) => {
+        // Get the previous listItems
+        const prevItems = queryClient.getQueryData('list-items')
+        queryClient.setQueryData('list-items', oldData => {
+          return R.reject(el => el.id === id, oldData)
+        })
+        // The value return from onMutate will be the third argument that onError receives
+        return () => queryClient.setQueryData('list-items', prevItems)
+      },
     },
   )
   return {...mutation, remove: mutation.mutateAsync}
