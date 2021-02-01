@@ -24,6 +24,12 @@ function getBookSearchConfig(query, user) {
       client(`books?query=${encodeURIComponent(query)}`, {
         token: user.token,
       }).then(data => data.books),
+    //Once getting the search results, insert all results into the book info query
+    onSuccess: books => {
+      for (let book of books) {
+        setQueryDataForBook(book)
+      }
+    },
   }
 }
 
@@ -49,4 +55,10 @@ function useBook(bookId, user) {
   return {...result, book: result?.data || loadingBook}
 }
 
-export {useBookSearch, useBook, refetchBookSearchQuery}
+function setQueryDataForBook(book) {
+  //Once getting the search results, insert all results into the book info query
+  //so that we don't have to fetch data we've already had again
+  queryClient.setQueryData(['book', {bookId: book.id}], book)
+}
+
+export {useBookSearch, useBook, refetchBookSearchQuery, setQueryDataForBook}
