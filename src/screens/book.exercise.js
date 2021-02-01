@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import {jsx} from '@emotion/core'
+import {jsx, css} from '@emotion/core'
 import * as React from 'react'
 import debounceFn from 'debounce-fn'
 import {FaRegCalendarAlt} from 'react-icons/fa'
@@ -14,6 +14,7 @@ import * as colors from 'styles/colors'
 import {Textarea} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
+import {ErrorMessage} from 'components/lib'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
@@ -103,7 +104,7 @@ function ListItemTimeframe({listItem}) {
 }
 
 function NotesTextarea({listItem, user}) {
-  const {mutate} = useUpdateListItem(user)
+  const {mutate, isError, error} = useUpdateListItem(user)
 
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
@@ -118,22 +119,35 @@ function NotesTextarea({listItem, user}) {
       <div>
         <label
           htmlFor="notes"
-          css={{
-            display: 'inline-block',
-            marginRight: 10,
-            marginTop: '0',
-            marginBottom: '0.5rem',
-            fontWeight: 'bold',
-          }}
+          css={css`
+            display: inline-block;
+            margin-right: 10;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+          `}
         >
           Notes
         </label>
+        {isError ? (
+          <ErrorMessage
+            error={error}
+            variant="inline"
+            css={css`
+              margin-left: 6;
+              font-size: 0.7em;
+            `}
+          />
+        ) : null}
       </div>
       <Textarea
         id="notes"
         defaultValue={listItem.notes}
         onChange={handleNotesChange}
-        css={{width: '100%', minHeight: 300}}
+        css={css`
+          width: 100%;
+          min-height: 300;
+        `}
       />
     </React.Fragment>
   )

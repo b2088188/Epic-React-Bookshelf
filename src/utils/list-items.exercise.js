@@ -28,7 +28,8 @@ function useDefaultMutationOptions() {
   return {onSettled: () => queryClient.invalidateQueries('list-items')}
 }
 
-function useCreateListItem(user) {
+function useCreateListItem(user, customOptions) {
+  const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "create"
   // the mutate function should call the list-items endpoint with a POST
   // and the bookId the listItem is being created for.
@@ -39,12 +40,17 @@ function useCreateListItem(user) {
         data: {bookId},
         token: user.token,
       }),
-    useDefaultMutationOptions(),
+    {
+      ...defaultOptions,
+      ...customOptions,
+    },
   )
   return {...mutation, create: mutation.mutateAsync}
 }
 
-function useUpdateListItem(user) {
+function useUpdateListItem(user, customOptions) {
+  const defaultOptions = useDefaultMutationOptions()
+
   // the mutate function should call the list-items/:listItemId endpoint with a PUT
   //   and the updates as data.
   const mutation = useMutation(
@@ -54,12 +60,16 @@ function useUpdateListItem(user) {
         data: updates,
         token: user.token,
       }),
-    useDefaultMutationOptions(),
+    {
+      ...defaultOptions,
+      ...customOptions,
+    },
   )
   return {...mutation, update: mutation.mutateAsync}
 }
 
-function useRemoveListItem(user) {
+function useRemoveListItem(user, customOptions) {
+  const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "remove"
   // the mutate function should call the list-items/:listItemId endpoint with a DELETE
   const mutation = useMutation(
@@ -68,7 +78,10 @@ function useRemoveListItem(user) {
         method: 'DELETE',
         token: user.token,
       }),
-    useDefaultMutationOptions(),
+    {
+      ...defaultOptions,
+      ...customOptions,
+    },
   )
   return {...mutation, remove: mutation.mutateAsync}
 }
