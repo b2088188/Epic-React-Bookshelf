@@ -10,9 +10,8 @@ import {client} from './utils/api-client'
 import {useAsync} from './utils/hooks'
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
-import {QueryClient, QueryClientProvider} from 'react-query'
+import {useQueryClient} from 'react-query'
 
-const queryClient = new QueryClient()
 async function getUser() {
   let user = null
 
@@ -26,6 +25,7 @@ async function getUser() {
 }
 
 function App() {
+  const queryClient = useQueryClient()
   const {
     data: user,
     error,
@@ -74,15 +74,13 @@ function App() {
   if (isSuccess) {
     const props = {user, login, register, logout}
     return user ? (
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <AuthenticatedApp {...props} />
-        </Router>
-      </QueryClientProvider>
+      <Router>
+        <AuthenticatedApp {...props} />
+      </Router>
     ) : (
       <UnauthenticatedApp {...props} />
     )
   }
 }
 
-export {App, queryClient}
+export {App}

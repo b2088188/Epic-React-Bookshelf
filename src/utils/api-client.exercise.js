@@ -1,4 +1,4 @@
-import {queryClient} from '../app.exercise'
+import {queryClient} from '../index.exercise'
 import * as auth from 'auth-provider'
 const apiURL = process.env.REACT_APP_API_URL
 async function client(
