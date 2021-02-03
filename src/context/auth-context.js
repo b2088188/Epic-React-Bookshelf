@@ -23,9 +23,12 @@ function useClient() {
 		user: {token},
 	} = useAuth()
 	// Exposing an authenticated version of client
-	return function authenticatedClient(endpoint, config) {
-		return useCallback(client(endpoint, {...config, token}), [token])
-	}
+	return useCallback(
+		function (endpoint, config) {
+			return client(endpoint, {...config, token})
+		},
+		[token],
+	)
 }
 
 async function getUser() {
