@@ -107,7 +107,9 @@ function UnauthenticatedApp() {
       >
         <Modal>
           <ModalOpenButton>
-            <Button variant="primary">Login</Button>
+            <Button variant="primary" onClick={() => console.log('hi')}>
+              Login
+            </Button>
           </ModalOpenButton>
           <ModalContents aria-label="Login form">
             {circleDismissButton}
