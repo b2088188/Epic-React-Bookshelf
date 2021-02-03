@@ -1,12 +1,11 @@
 import * as R from 'ramda'
-import {useContext} from 'react'
-import {AuthContext} from 'context/auth-context'
+import {useAuth} from 'context/auth-context'
 import {setQueryDataForBook} from './books'
 import {useQuery, useQueryClient, useMutation} from 'react-query'
 import {client} from 'utils/api-client.exercise'
 
 function useListItems() {
-  const {user} = useContext(AuthContext)
+  const {user} = useAuth()
   // get the user's list items from the list-items endpoint
   // queryKey should be 'list-items'
   // queryFn should call the 'list-items' endpoint with the user's token
@@ -48,7 +47,7 @@ function useDefaultMutationOptions() {
 }
 
 function useCreateListItem(customOptions) {
-  const {user} = useContext(AuthContext)
+  const {user} = useAuth()
   const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "create"
   // the mutate function should call the list-items endpoint with a POST
@@ -69,7 +68,7 @@ function useCreateListItem(customOptions) {
 }
 
 function useUpdateListItem(customOptions) {
-  const {user} = useContext(AuthContext)
+  const {user} = useAuth()
   const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
 
@@ -107,7 +106,7 @@ function useUpdateListItem(customOptions) {
 }
 
 function useRemoveListItem(customOptions) {
-  const {user} = useContext(AuthContext)
+  const {user} = useAuth()
   const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "remove"

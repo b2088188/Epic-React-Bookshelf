@@ -1,5 +1,5 @@
-import {useContext, useCallback} from 'react'
-import {AuthContext} from '../context/auth-context'
+import {useCallback} from 'react'
+import {useAuth} from '../context/auth-context'
 import {queryClient} from '../index.exercise'
 import {useQuery} from 'react-query'
 import {client} from 'utils/api-client.exercise'
@@ -36,13 +36,13 @@ function getBookSearchConfig(query, user) {
 }
 
 function useBookSearch(query) {
-  const {user} = useContext(AuthContext)
+  const {user} = useAuth()
   const result = useQuery(getBookSearchConfig(query, user))
   return {...result, books: result?.data || loadingBooks}
 }
 
 function useRefetchBookSearchQuery() {
-  const {user} = useContext(AuthContext)
+  const {user} = useAuth()
   return useCallback(
     async function refetchBookSearchQuery() {
       //remove old book search query
@@ -55,7 +55,7 @@ function useRefetchBookSearchQuery() {
 }
 
 function useBook(bookId) {
-  const {user} = useContext(AuthContext)
+  const {user} = useAuth()
   const result = useQuery({
     queryKey: ['book', {bookId}],
     queryFn: () =>

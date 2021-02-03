@@ -2,8 +2,8 @@
 import {jsx} from '@emotion/core'
 
 import {Routes, Route, Link as RouterLink, useMatch} from 'react-router-dom'
-import {useContext} from 'react'
-import {AuthContext} from './context/auth-context'
+import React from 'react'
+import {useAuth} from './context/auth-context'
 import {ErrorBoundary} from 'react-error-boundary'
 import {Button, ErrorMessage, FullPageErrorFallback} from './components/lib'
 import * as mq from './styles/media-queries'
@@ -30,7 +30,7 @@ function ErrorFallback({error}) {
 }
 
 function AuthenticatedApp() {
-  const {user, logout} = useContext(AuthContext)
+  const {user, logout} = useAuth()
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       <div
