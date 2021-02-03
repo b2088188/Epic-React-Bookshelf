@@ -40,7 +40,26 @@ const ModalOpenButton = ({children: child}) => {
   })
 }
 
-const ModalContents = props => {
+// Custom Modal with close button and title
+const ModalContents = ({title, children, ...props}) => {
+  return (
+    <ModalContentsBase {...props}>
+      <div css={{display: 'flex', justifyContent: 'flex-end'}}>
+        <ModalDismissButton>
+          <CircleButton>
+            <VisuallyHidden>Close</VisuallyHidden>
+            <span aria-hidden>×</span>
+          </CircleButton>
+        </ModalDismissButton>
+      </div>
+      <h3 css={{textAlign: 'center', fontSize: '2em'}}>{title}</h3>
+      {children}
+    </ModalContentsBase>
+  )
+}
+
+// Base Modal
+const ModalContentsBase = props => {
   const {isOpen, setIsOpen} = useContext(ModalContext)
 
   return (
