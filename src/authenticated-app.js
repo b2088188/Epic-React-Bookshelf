@@ -158,4 +158,5 @@ function AppRoutes() {
   )
 }
 
-export {AuthenticatedApp}
+// lazy loading must be a defaul exported component
+export default AuthenticatedApp

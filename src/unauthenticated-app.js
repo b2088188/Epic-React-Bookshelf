@@ -122,5 +122,5 @@ function UnauthenticatedApp() {
     </div>
   )
 }
-
-export {UnauthenticatedApp}
+// lazy loading must be a defaul exported component
+export default UnauthenticatedApp
