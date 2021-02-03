@@ -1,9 +1,12 @@
 import * as R from 'ramda'
+import {useContext} from 'react'
+import {AuthContext} from 'context/auth-context'
 import {setQueryDataForBook} from './books'
 import {useQuery, useQueryClient, useMutation} from 'react-query'
 import {client} from 'utils/api-client.exercise'
 
-function useListItems(user) {
+function useListItems() {
+  const {user} = useContext(AuthContext)
   // get the user's list items from the list-items endpoint
   // queryKey should be 'list-items'
   // queryFn should call the 'list-items' endpoint with the user's token
@@ -21,8 +24,8 @@ function useListItems(user) {
   return listItems ?? []
 }
 
-function useListItem(user, bookId) {
-  const listItems = useListItems(user)
+function useListItem(bookId) {
+  const listItems = useListItems()
   // search through the listItems  and find the one with the matched bookId.
   return listItems.find(el => el.bookId === bookId) ?? null
   // 🦉 NOTE: the backend doesn't support getting a single list-item by it's ID
@@ -44,7 +47,8 @@ function useDefaultMutationOptions() {
   }
 }
 
-function useCreateListItem(user, customOptions) {
+function useCreateListItem(customOptions) {
+  const {user} = useContext(AuthContext)
   const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "create"
   // the mutate function should call the list-items endpoint with a POST
@@ -64,7 +68,8 @@ function useCreateListItem(user, customOptions) {
   return {...mutation, create: mutation.mutateAsync}
 }
 
-function useUpdateListItem(user, customOptions) {
+function useUpdateListItem(customOptions) {
+  const {user} = useContext(AuthContext)
   const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
 
@@ -101,7 +106,8 @@ function useUpdateListItem(user, customOptions) {
   return {...mutation, update: mutation.mutateAsync}
 }
 
-function useRemoveListItem(user, customOptions) {
+function useRemoveListItem(customOptions) {
+  const {user} = useContext(AuthContext)
   const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "remove"

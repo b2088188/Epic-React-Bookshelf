@@ -1,7 +1,8 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
-import * as React from 'react'
+import React from 'react'
+import {AuthContext} from './context/auth-context'
 import * as auth from 'auth-provider'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {FullPageSpinner} from './components/lib'
@@ -73,12 +74,16 @@ function App() {
 
   if (isSuccess) {
     const props = {user, login, register, logout}
-    return user ? (
-      <Router>
-        <AuthenticatedApp {...props} />
-      </Router>
-    ) : (
-      <UnauthenticatedApp {...props} />
+    return (
+      <AuthContext.Provider value={props}>
+        {user ? (
+          <Router>
+            <AuthenticatedApp {...props} />
+          </Router>
+        ) : (
+          <UnauthenticatedApp {...props} />
+        )}
+      </AuthContext.Provider>
     )
   }
 }

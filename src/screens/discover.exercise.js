@@ -4,27 +4,25 @@ import {jsx} from '@emotion/core'
 import {useState, useEffect} from 'react'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
-import {useBookSearch, refetchBookSearchQuery} from 'utils/books'
+import {useBookSearch, useRefetchBookSearchQuery} from 'utils/books'
 import * as colors from 'styles/colors'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Spinner, Input} from 'components/lib'
 
-function DiscoverBooksScreen({user}) {
+function DiscoverBooksScreen() {
   const [query, setQuery] = useState('')
   const [queried, setQueried] = useState(false)
   // 🐨 replace this useAsync call with a useQuery call to handle the book search
   // the queryKey should be ['bookSearch', {query}]
   // the queryFn should be the same thing we have in the run function below
   // you'll get back the same stuff you get from useAsync, (except the run function)
-  const {books, error, isLoading, isError, isSuccess} = useBookSearch(
-    query,
-    user,
-  )
+  const {books, error, isLoading, isError, isSuccess} = useBookSearch(query)
+  const refetchBookSearchQuery = useRefetchBookSearchQuery()
 
   useEffect(() => {
     // When component unmount, remove old book search query from cache and refetch new one
-    return () => refetchBookSearchQuery(user)
-  }, [user])
+    return () => refetchBookSearchQuery()
+  }, [refetchBookSearchQuery])
 
   function handleSearchSubmit(event) {
     event.preventDefault()
@@ -93,7 +91,7 @@ function DiscoverBooksScreen({user}) {
           <BookListUL css={{marginTop: 20}}>
             {books.map(book => (
               <li key={book.id} aria-label={book.title}>
-                <BookRow user={user} key={book.id} book={book} />
+                <BookRow key={book.id} book={book} />
               </li>
             ))}
           </BookListUL>

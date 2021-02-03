@@ -1,3 +1,5 @@
+import {useContext, useCallback} from 'react'
+import {AuthContext} from '../context/auth-context'
 import {queryClient} from '../index.exercise'
 import {useQuery} from 'react-query'
 import {client} from 'utils/api-client.exercise'
@@ -33,20 +35,27 @@ function getBookSearchConfig(query, user) {
   }
 }
 
-function useBookSearch(query, user) {
+function useBookSearch(query) {
+  const {user} = useContext(AuthContext)
   const result = useQuery(getBookSearchConfig(query, user))
   return {...result, books: result?.data || loadingBooks}
 }
 
-function refetchBookSearchQuery(user) {
-  //remove old book search query
-  queryClient.removeQueries('bookSearch')
-  //refetch a new query with empty string
-  queryClient.prefetchQuery(getBookSearchConfig('', user))
+function useRefetchBookSearchQuery() {
+  const {user} = useContext(AuthContext)
+  return useCallback(
+    async function refetchBookSearchQuery() {
+      //remove old book search query
+      queryClient.removeQueries('bookSearch')
+      //refetch a new query with empty string
+      queryClient.prefetchQuery(getBookSearchConfig('', user))
+    },
+    [user],
+  )
 }
 
-function useBook(bookId, user) {
-  // queryKey should be ['book', {bookId}]
+function useBook(bookId) {
+  const {user} = useContext(AuthContext)
   const result = useQuery({
     queryKey: ['book', {bookId}],
     queryFn: () =>
@@ -61,4 +70,4 @@ function setQueryDataForBook(book) {
   queryClient.setQueryData(['book', {bookId: book.id}], book)
 }
 
-export {useBookSearch, useBook, refetchBookSearchQuery, setQueryDataForBook}
+export {useBookSearch, useBook, useRefetchBookSearchQuery, setQueryDataForBook}

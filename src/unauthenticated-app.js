@@ -1,7 +1,8 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
-import * as React from 'react'
+import React, {useContext} from 'react'
+import {AuthContext} from './context/auth-context'
 import {Input, Button, Spinner, FormGroup, ErrorMessage} from './components/lib'
 import {Modal, ModalContents, ModalOpenButton} from './components/modal'
 import {Logo} from './components/logo'
@@ -58,7 +59,8 @@ function LoginForm({onSubmit, submitButton}) {
   )
 }
 
-function UnauthenticatedApp({login, register}) {
+function UnauthenticatedApp() {
+  const {login, register} = useContext(AuthContext)
   return (
     <div
       css={{

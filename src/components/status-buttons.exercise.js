@@ -52,11 +52,11 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   )
 }
 
-function StatusButtons({user, book}) {
-  const listItem = useListItem(user, book.id) // Disable automatic error handling by react query, propagate error to useAsync
-  const {mutateAsync: update} = useUpdateListItem(user, {throwOnError: true})
-  const {remove} = useRemoveListItem(user, {throwOnError: true})
-  const {create} = useCreateListItem(user, {throwOnError: true})
+function StatusButtons({book}) {
+  const listItem = useListItem(book.id) // Disable automatic error handling by react query, propagate error to useAsync
+  const {mutateAsync: update} = useUpdateListItem({throwOnError: true})
+  const {remove} = useRemoveListItem({throwOnError: true})
+  const {create} = useCreateListItem({throwOnError: true})
 
   return (
     <React.Fragment>
