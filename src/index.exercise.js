@@ -4,6 +4,7 @@ import * as React from 'react'
 import ReactDOM from 'react-dom'
 import {App} from './app'
 import {QueryClient, QueryClientProvider} from 'react-query'
+import {AuthProvider} from './context/auth-context'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,7 +25,9 @@ export const queryClient = new QueryClient({
 loadDevTools(() => {
   ReactDOM.render(
     <QueryClientProvider client={queryClient}>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </QueryClientProvider>,
     document.getElementById('root'),
   )
