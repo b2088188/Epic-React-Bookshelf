@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {useContext, createContext} from 'react'
 import {useQueryClient} from 'react-query'
 import * as auth from 'auth-provider'
@@ -16,6 +16,16 @@ function useAuth() {
 	const context = useContext(AuthContext)
 	if (!context) throw new Error('useAuth must have to use a AuthProvider')
 	return context
+}
+
+function useClient() {
+	const {
+		user: {token},
+	} = useAuth()
+	// Exposing an authenticated version of client
+	return function authenticatedClient(endpoint, config) {
+		return useCallback(client(endpoint, {...config, token}), [token])
+	}
 }
 
 async function getUser() {
@@ -79,4 +89,4 @@ function AuthProvider(props) {
 	if (isSuccess) return <AuthContext.Provider value={value} {...props} />
 }
 
-export {AuthProvider, useAuth}
+export {AuthProvider, useAuth, useClient}

@@ -1,18 +1,16 @@
 import * as R from 'ramda'
-import {useAuth} from 'context/auth-context'
+import {useClient} from 'context/auth-context'
 import {setQueryDataForBook} from './books'
 import {useQuery, useQueryClient, useMutation} from 'react-query'
-import {client} from 'utils/api-client.exercise'
 
 function useListItems() {
-  const {user} = useAuth()
+  const client = useClient()
   // get the user's list items from the list-items endpoint
   // queryKey should be 'list-items'
   // queryFn should call the 'list-items' endpoint with the user's token
   const {data: listItems} = useQuery({
     queryKey: 'list-items',
-    queryFn: () =>
-      client('list-items', {token: user.token}).then(data => data.listItems),
+    queryFn: () => client('list-items').then(data => data.listItems),
     onSuccess: listItems => {
       for (let listItem of listItems) {
         //Once getting the listitems results, insert all results into the book info query
@@ -47,7 +45,7 @@ function useDefaultMutationOptions() {
 }
 
 function useCreateListItem(customOptions) {
-  const {user} = useAuth()
+  const client = useClient()
   const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "create"
   // the mutate function should call the list-items endpoint with a POST
@@ -57,7 +55,6 @@ function useCreateListItem(customOptions) {
       client(`list-items`, {
         method: 'POST',
         data: {bookId},
-        token: user.token,
       }),
     {
       ...defaultOptions,
@@ -68,7 +65,7 @@ function useCreateListItem(customOptions) {
 }
 
 function useUpdateListItem(customOptions) {
-  const {user} = useAuth()
+  const client = useClient()
   const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
 
@@ -79,7 +76,6 @@ function useUpdateListItem(customOptions) {
       client(`list-items/${updates.id}`, {
         method: 'PUT',
         data: updates,
-        token: user.token,
       }),
     {
       ...defaultOptions,
@@ -106,7 +102,7 @@ function useUpdateListItem(customOptions) {
 }
 
 function useRemoveListItem(customOptions) {
-  const {user} = useAuth()
+  const client = useClient()
   const queryClient = useQueryClient()
   const defaultOptions = useDefaultMutationOptions()
   // 🐨 call useMutation here and assign the mutate function to "remove"
@@ -115,7 +111,6 @@ function useRemoveListItem(customOptions) {
     ({id}) =>
       client(`list-items/${id}`, {
         method: 'DELETE',
-        token: user.token,
       }),
     {
       ...defaultOptions,

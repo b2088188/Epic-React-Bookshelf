@@ -1,8 +1,7 @@
 import {useCallback} from 'react'
-import {useAuth} from '../context/auth-context'
+import {useClient} from '../context/auth-context'
 import {queryClient} from '../context'
 import {useQuery} from 'react-query'
-import {client} from 'utils/api-client.exercise'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
 
 const loadingBook = {
@@ -19,13 +18,13 @@ const loadingBooks = Array.from({length: 10}, (v, index) => ({
   ...loadingBook,
 }))
 
-function getBookSearchConfig(query, user) {
+function getBookSearchConfig(query, client) {
   return {
     queryKey: ['bookSearch', {query}],
     queryFn: () =>
-      client(`books?query=${encodeURIComponent(query)}`, {
-        token: user.token,
-      }).then(data => data.books),
+      client(`books?query=${encodeURIComponent(query)}`).then(
+        data => data.books,
+      ),
     //Once getting the search results, insert all results into the book info query
     onSuccess: books => {
       for (let book of books) {
@@ -36,30 +35,29 @@ function getBookSearchConfig(query, user) {
 }
 
 function useBookSearch(query) {
-  const {user} = useAuth()
-  const result = useQuery(getBookSearchConfig(query, user))
+  const client = useClient()
+  const result = useQuery(getBookSearchConfig(query, client))
   return {...result, books: result?.data || loadingBooks}
 }
 
 function useRefetchBookSearchQuery() {
-  const {user} = useAuth()
+  const client = useClient()
   return useCallback(
     async function refetchBookSearchQuery() {
       //remove old book search query
       queryClient.removeQueries('bookSearch')
       //refetch a new query with empty string
-      queryClient.prefetchQuery(getBookSearchConfig('', user))
+      queryClient.prefetchQuery(getBookSearchConfig('', client))
     },
-    [user],
+    [client],
   )
 }
 
 function useBook(bookId) {
-  const {user} = useAuth()
+  const client = useClient()
   const result = useQuery({
     queryKey: ['book', {bookId}],
-    queryFn: () =>
-      client(`books/${bookId}`, {token: user.token}).then(data => data.book),
+    queryFn: () => client(`books/${bookId}`).then(data => data.book),
   })
   return {...result, book: result?.data || loadingBook}
 }
