@@ -1,6 +1,6 @@
 import {useCallback} from 'react'
 import {useAuth} from '../context/auth-context'
-import {queryClient} from '../index.exercise'
+import {queryClient} from '../context'
 import {useQuery} from 'react-query'
 import {client} from 'utils/api-client.exercise'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
