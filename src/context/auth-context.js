@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-import React, {useCallback} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import {useContext, createContext} from 'react'
 import {useQueryClient} from 'react-query'
 import * as auth from 'auth-provider'
@@ -60,6 +60,27 @@ function AuthProvider(props) {
 		run(getUser())
 	}, [run])
 
+	const login = useCallback(
+		form => auth.login(form).then(user => setData(user)),
+		[setData],
+	)
+	const register = useCallback(
+		form => auth.register(form).then(user => setData(user)),
+		[setData],
+	)
+	const logout = useCallback(() => {
+		auth.logout()
+		queryClient.clear()
+		setData(null)
+	}, [setData])
+
+	const value = useMemo(() => ({user, login, register, logout}), [
+		user,
+		login,
+		register,
+		logout,
+	])
+
 	if (isLoading || isIdle) {
 		return <FullPageSpinner />
 	}
@@ -81,14 +102,7 @@ function AuthProvider(props) {
 			</div>
 		)
 	}
-	const login = form => auth.login(form).then(user => setData(user))
-	const register = form => auth.register(form).then(user => setData(user))
-	const logout = () => {
-		auth.logout()
-		queryClient.clear()
-		setData(null)
-	}
-	const value = {user, login, register, logout}
+
 	if (isSuccess) return <AuthContext.Provider value={value} {...props} />
 }
 
